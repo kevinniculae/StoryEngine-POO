@@ -1,0 +1,323 @@
+{
+  "title": "Marea Evadare",
+  "author": "Student POO 2026",
+  "description": "O poveste de aventură steampunk. Trebuie să evadezi dintr-un district industrial înainte de lăsarea nopții.",
+  "startBlock": "intro.arrival",
+  "version": "1.0",
+  "properties": [
+    {
+      "key": "player.life",
+      "hudLabel": "Viață",
+      "min": 0, "max": 100, "initial": 100,
+      "visibleInHud": true, "hudOrder": 1,
+      "onMinBlock": "ending.death"
+    },
+    {
+      "key": "player.energy",
+      "hudLabel": "Energie",
+      "min": 0, "max": 100, "initial": 80,
+      "visibleInHud": true, "hudOrder": 2
+    },
+    {
+      "key": "inventory.money",
+      "hudLabel": "Bani",
+      "min": 0, "max": 50, "initial": 15,
+      "visibleInHud": true, "hudOrder": 3
+    },
+    {
+      "key": "story.hasKey",
+      "hudLabel": "Cheie",
+      "min": 0, "max": 1, "initial": 0,
+      "visibleInHud": false, "hudOrder": 99
+    },
+    {
+      "key": "story.guardDefeated",
+      "hudLabel": "Garda",
+      "min": 0, "max": 1, "initial": 0,
+      "visibleInHud": false, "hudOrder": 99
+    }
+  ],
+  "blocks": [
+    {
+      "id": "intro.arrival",
+      "backgroundImage": "images/intro_arrival.jpg",
+      "isFinal": false,
+      "text": "Ajungi într-o piață întunecată, la marginea districtului industrial. Ceața groasă acoperă caldarâmul uzat, iar zăngănitul mașinăriilor răzbate din întuneric.\n\nO alee duce spre han, alta spre atelierul mecanicului. O poartă uriașă de metal blochează singura ieșire din district.\n\nTrebuie să găsești o cale înainte de lăsarea nopții.",
+      "decisions": [
+        {
+          "text": "Mergi la han",
+          "targetBlock": "inn.entry",
+          "icon": "images/icon_walk.png",
+          "effects": [{ "type": "ADD", "property": "player.energy", "value": -5 }]
+        },
+        {
+          "text": "Mergi la atelierul mecanicului",
+          "targetBlock": "workshop.entry",
+          "icon": "images/icon_walk.png",
+          "effects": [{ "type": "ADD", "property": "player.energy", "value": -3 }]
+        },
+        {
+          "text": "Încearcă să forțezi poarta",
+          "targetBlock": "gate.locked",
+          "icon": "images/icon_run.png",
+          "condition": {
+            "type": "COMPARISON",
+            "property": "story.hasKey", "operator": "==", "value": 0
+          }
+        },
+        {
+          "text": "Deschide poarta cu cheia!",
+          "targetBlock": "ending.escape",
+          "icon": "images/icon_key.png",
+          "condition": {
+            "type": "AND",
+            "conditions": [
+              { "type": "COMPARISON", "property": "story.hasKey", "operator": "==", "value": 1 },
+              { "type": "COMPARISON", "property": "player.energy", "operator": ">=", "value": 10 }
+            ]
+          },
+          "effects": [{ "type": "ADD", "property": "player.energy", "value": -10 }]
+        }
+      ]
+    },
+    {
+      "id": "inn.entry",
+      "backgroundImage": "images/inn_interior.jpg",
+      "isFinal": false,
+      "text": "Intri în han. Mirosul de bere ieftină și fum de tutun te întâmpină. Câțiva muncitori epuizați discută în colț.\n\nHangița, o femeie robustă cu ochi ageri, te privește cu suspiciune:\n«Ce dorești, străinule?»",
+      "decisions": [
+        {
+          "text": "Cumpără masă și odihnă — 10 bani (recuperezi viață și energie)",
+          "targetBlock": "inn.rested",
+          "icon": "images/icon_money.png",
+          "condition": {
+            "type": "COMPARISON", "property": "inventory.money", "operator": ">=", "value": 10
+          },
+          "effects": [
+            { "type": "ADD", "property": "inventory.money", "value": -10 },
+            { "type": "ADD", "property": "player.energy",   "value": 40  },
+            { "type": "ADD", "property": "player.life",     "value": 20  }
+          ]
+        },
+        {
+          "text": "Ascultă conversația muncitorilor",
+          "targetBlock": "inn.eavesdrop",
+          "icon": "images/icon_talk.png"
+        },
+        {
+          "text": "Ieși din han",
+          "targetBlock": "intro.arrival",
+          "icon": "images/icon_run.png"
+        }
+      ]
+    },
+    {
+      "id": "inn.rested",
+      "backgroundImage": "images/inn_interior.jpg",
+      "isFinal": false,
+      "text": "Te odihnești câteva ore. Hangița îți aduce tocăniță și pâine.\n\nTe simți mult mai bine! Profitând de un moment de liniște, hangița îți șoptește:\n\n«Mecanicul din atelier are o cheie pentru poarta principală. Nu e ieftin — dar dacă ai bani... sau curaj...»",
+      "decisions": [
+        {
+          "text": "Du-te la atelier",
+          "targetBlock": "workshop.entry",
+          "icon": "images/icon_walk.png"
+        },
+        {
+          "text": "Întoarce-te în piață",
+          "targetBlock": "intro.arrival",
+          "icon": "images/icon_run.png"
+        }
+      ]
+    },
+    {
+      "id": "inn.eavesdrop",
+      "backgroundImage": "images/inn_interior.jpg",
+      "isFinal": false,
+      "text": "Te apropii discret de masa muncitorilor. Discută în șoaptă despre un pasaj secret sub districtul industrial.\n\n«Îl găsești sub depozitul de cărbune», spune unul.\n«Da, dar e păzit de Gardianul Mecanic», adaugă altul cu voce speriată.\n\nInformație valoroasă.",
+      "decisions": [
+        {
+          "text": "Caută pasajul secret sub depozit",
+          "targetBlock": "secret.passage",
+          "icon": "images/icon_walk.png",
+          "effects": [{ "type": "ADD", "property": "player.energy", "value": -15 }]
+        },
+        {
+          "text": "Întoarce-te în piață",
+          "targetBlock": "intro.arrival",
+          "icon": "images/icon_run.png"
+        }
+      ]
+    },
+    {
+      "id": "workshop.entry",
+      "backgroundImage": "images/workshop.jpg",
+      "isFinal": false,
+      "text": "Atelierul mecanicului e plin de angrenaje, pistoane și mirosul pătrunzător de ulei.\n\nBătrânul mecanic te privește deasupra ochelarilor groși:\n«Ai nevoie de ceva, tinere?»\n\nPe bancul de lucru, printre scule dezordonate, zace o cheie veche de alamă.",
+      "decisions": [
+        {
+          "text": "Cumpără cheia — 5 bani",
+          "targetBlock": "workshop.bought",
+          "icon": "images/icon_key.png",
+          "condition": {
+            "type": "AND",
+            "conditions": [
+              { "type": "COMPARISON", "property": "inventory.money", "operator": ">=", "value": 5 },
+              { "type": "COMPARISON", "property": "story.hasKey", "operator": "==", "value": 0 }
+            ]
+          },
+          "effects": [
+            { "type": "ADD", "property": "inventory.money", "value": -5 },
+            { "type": "SET", "property": "story.hasKey",    "value": 1  }
+          ]
+        },
+        {
+          "text": "Încearcă să furi cheia",
+          "targetBlock": "workshop.steal",
+          "icon": "images/icon_steal.png",
+          "condition": {
+            "type": "COMPARISON", "property": "story.hasKey", "operator": "==", "value": 0
+          }
+        },
+        {
+          "text": "Pleacă (ai deja cheia)",
+          "targetBlock": "intro.arrival",
+          "icon": "images/icon_key.png",
+          "condition": {
+            "type": "COMPARISON", "property": "story.hasKey", "operator": "==", "value": 1
+          }
+        },
+        {
+          "text": "Pleacă fără să cumperi",
+          "targetBlock": "intro.arrival",
+          "icon": "images/icon_run.png",
+          "condition": {
+            "type": "COMPARISON", "property": "story.hasKey", "operator": "==", "value": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "workshop.bought",
+      "backgroundImage": "images/workshop.jpg",
+      "isFinal": false,
+      "text": "Mecanicul îți înmânează cheia cu un zâmbet enigmatic, rostogolindu-o între degete înainte de a o ceda.\n\n«Poarta cea mare din piață», spune el. «Dar ai grijă — gardienii patrulează noaptea.»\n\nSimți metalul rece al alamei în palmă. Libertatea e la un pas.",
+      "decisions": [
+        {
+          "text": "Mergi repede la poartă!",
+          "targetBlock": "intro.arrival",
+          "icon": "images/icon_run.png"
+        }
+      ]
+    },
+    {
+      "id": "workshop.steal",
+      "backgroundImage": "images/workshop.jpg",
+      "isFinal": false,
+      "text": "Profiti de o clipă când mecanicul întoarce spatele.\n\nDar bătrânul are reflexe surprinzătoare! Se întoarce brusc și te lovește cu o cheie franceză masivă.\n\nDoare îngrozitor, dar reușești să apuci cheia și să fugi afară!",
+      "decisions": [
+        {
+          "text": "Fugi spre piață cu cheia furată!",
+          "targetBlock": "intro.arrival",
+          "icon": "images/icon_run.png",
+          "effects": [
+            { "type": "ADD", "property": "player.life",  "value": -30 },
+            { "type": "SET", "property": "story.hasKey", "value": 1   }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gate.locked",
+      "backgroundImage": "images/gate_locked.jpg",
+      "isFinal": false,
+      "text": "Poarta uriașă de metal forjat se ridică la șapte metri înălțime. Lacătul masiv râde de eforturile tale.\n\nÎncerci să-l forțezi — imposibil cu mâinile goale.\n\nAi nevoie de o cheie sau de altă cale.",
+      "decisions": [
+        {
+          "text": "Întoarce-te și găsește o soluție",
+          "targetBlock": "intro.arrival",
+          "icon": "images/icon_run.png"
+        }
+      ]
+    },
+    {
+      "id": "secret.passage",
+      "backgroundImage": "images/secret_passage.jpg",
+      "isFinal": false,
+      "text": "Găsești o trapă ruginită ascunsă sub un coș de gunoi. Cobori în întunericul total.\n\nPasajul miroase a rugină și apă stagnantă. La capătul coridorului, o siluetă metalică îți blochează calea.\n\nGardianul Mecanic. Ochii lui roșii te scanează lent.",
+      "decisions": [
+        {
+          "text": "Luptă cu Gardianul (necesită 30 energie)",
+          "targetBlock": "secret.fought",
+          "icon": "images/icon_fight.png",
+          "condition": {
+            "type": "COMPARISON", "property": "player.energy", "operator": ">=", "value": 30
+          },
+          "effects": [
+            { "type": "ADD", "property": "player.energy",       "value": -30 },
+            { "type": "ADD", "property": "player.life",         "value": -20 },
+            { "type": "SET", "property": "story.guardDefeated", "value": 1   }
+          ]
+        },
+        {
+          "text": "Mituiește Gardianul — 15 bani",
+          "targetBlock": "secret.bribed",
+          "icon": "images/icon_money.png",
+          "condition": {
+            "type": "OR",
+            "conditions": [
+              { "type": "COMPARISON", "property": "inventory.money", "operator": ">=", "value": 15 },
+              { "type": "COMPARISON", "property": "story.hasKey",    "operator": "==", "value": 1  }
+            ]
+          },
+          "effects": [{ "type": "ADD", "property": "inventory.money", "value": -15 }]
+        },
+        {
+          "text": "Fugi înapoi la suprafață",
+          "targetBlock": "intro.arrival",
+          "icon": "images/icon_run.png",
+          "effects": [{ "type": "ADD", "property": "player.energy", "value": -10 }]
+        }
+      ]
+    },
+    {
+      "id": "secret.fought",
+      "backgroundImage": "images/secret_passage.jpg",
+      "isFinal": false,
+      "text": "Te arunci în luptă cu tot ce ai!\n\nGardianul e lent dar puternic — eviți trei lovituri zdrobitoare și reușești să-i smulgi panoul de control din spate.\n\nAutomaul se prăbușește cu un zgomot asurzitor. Dincolo de el, lumina zilei!",
+      "decisions": [
+        {
+          "text": "Ieși prin pasaj spre libertate!",
+          "targetBlock": "ending.escape",
+          "icon": "images/icon_run.png"
+        }
+      ]
+    },
+    {
+      "id": "secret.bribed",
+      "backgroundImage": "images/secret_passage.jpg",
+      "isFinal": false,
+      "text": "Scoți monedele și le ții în fața senzorilor Gardianului.\n\nAutomatul le scanează, le cântărește, le analizează. Un bip. Două. Trei.\n\nSe dă la o parte cu un scârțâit de rugină. Câteodată, logica unui mecanism e mai simplă decât cea a unui om.\n\nDrumul e liber.",
+      "decisions": [
+        {
+          "text": "Ieși spre libertate!",
+          "targetBlock": "ending.escape",
+          "icon": "images/icon_run.png"
+        }
+      ]
+    },
+    {
+      "id": "ending.escape",
+      "backgroundImage": "images/ending_escape.jpg",
+      "isFinal": true,
+      "text": "Ieși în lumina orbitoare a dimineții.\n\nAerul proaspăt — atât de diferit de mirosul de fum și ulei al districtului — îți umple plămânii ca un val.\n\nÎți privești mâinile: libere. Fără lanțuri, fără ziduri, fără supraveghere.\n\nUndeva în depărtare, un tren fluieră. Noua ta viață te așteaptă.\n\n✨ Felicitări! Ai reușit să evadezi! ✨",
+      "decisions": []
+    },
+    {
+      "id": "ending.death",
+      "backgroundImage": "images/ending_death.jpg",
+      "isFinal": true,
+      "text": "Rănile, epuizarea și frigul te dobor pe caldarâmul umed al districtului.\n\nCăzut, privești cerul cenușiu printre coșurile de fabrică. Zăngănitul mașinilor continuă indiferent.\n\nNimeni nu vine să te ajute în Districtul Industrial.\n\nAceasta este... sfârșitul.\n\n💀 Joc terminat. Încearcă din nou!",
+      "decisions": []
+    }
+  ]
+}
